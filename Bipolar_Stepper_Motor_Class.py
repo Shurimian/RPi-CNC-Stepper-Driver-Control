@@ -14,7 +14,7 @@ class Bipolar_Stepper_Motor:
     dir = 0
     position = 0
     
-    def __init__(self,a1,a2,b1,b2):
+    def __init__(self, a1, a2, b1, b2):
     #initial a Bipolar_Stepper_Moter objects by assigning the pins
     
         GPIO.setmode(GPIO.BOARD)
@@ -24,10 +24,10 @@ class Bipolar_Stepper_Motor:
         self.b1 = b1
         self.b2 = b2
         
-        GPIO.setup(self.a1,GPIO.OUT)
-        GPIO.setup(self.a2,GPIO.OUT)
-        GPIO.setup(self.b1,GPIO.OUT)
-        GPIO.setup(self.b2,GPIO.OUT)
+        GPIO.setup(self.a1, GPIO.OUT)
+        GPIO.setup(self.a2, GPIO.OUT)
+        GPIO.setup(self.b1, GPIO.OUT)
+        GPIO.setup(self.b2, GPIO.OUT)
         
         self.phase = 0
         self.dir = 0        
@@ -35,12 +35,12 @@ class Bipolar_Stepper_Motor:
         
     def move(self, dir, steps, delay = 0.2):
         for _ in range(steps):
-            next_phase=(self.phase+dir) % num_phase
+            next_phase = (self.phase + dir) % num_phase
             
-            GPIO.output(self.a1,phase_seq[next_phase][0])
-            GPIO.output(self.b2,phase_seq[next_phase][1])
-            GPIO.output(self.a2,phase_seq[next_phase][2])
-            GPIO.output(self.b1,phase_seq[next_phase][3])
+            GPIO.output(self.a1, phase_seq[next_phase][0])
+            GPIO.output(self.b2, phase_seq[next_phase][1])
+            GPIO.output(self.a2, phase_seq[next_phase][2])
+            GPIO.output(self.b1, phase_seq[next_phase][3])
             
             self.phase = next_phase
             self.dir = dir
@@ -49,8 +49,8 @@ class Bipolar_Stepper_Motor:
             time.sleep(delay)
 
     def unhold(self):
-        GPIO.output(self.a1,0)
-        GPIO.output(self.a2,0)
-        GPIO.output(self.b1,0)
-        GPIO.output(self.b2,0)
+        GPIO.output(self.a1, 0)
+        GPIO.output(self.a2, 0)
+        GPIO.output(self.b1, 0)
+        GPIO.output(self.b2, 0)
         

@@ -13,7 +13,7 @@ from numpy import pi, sin, cos, sqrt, arccos, arcsin
 ################################################################################################
 
 #filename='filename.nc'; #file name of the G code commands
-filename = 'grid.nc'
+filename = 'GCode/grid.nc'
 
 GPIO.setmode(GPIO.BOARD)
 
@@ -24,7 +24,7 @@ MY = Bipolar_Stepper_Motor(11, 7, 5, 3)
 Laser_switch = 15
 
 dx = 0.075 #resolution in x direction. Unit: mm
-dy = 0.076 #resolution in y direction. Unit: mm
+dy = 0.075 #resolution in y direction. Unit: mm
 
 Engraving_speed = 0.4 #unit=mm/sec=0.04in/sec
 
@@ -40,7 +40,7 @@ GPIO.setup(Laser_switch, GPIO.OUT)
 
 GPIO.output(Laser_switch, False)
 
-speed = Engraving_speed/min(dx, dy)      #step/sec
+speed = Engraving_speed / min(dx, dy)      #step/sec
 
 ################################################################################################
 ################################################################################################
