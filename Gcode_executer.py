@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import pigpio as pig
 import Motor_control
 from Bipolar_Stepper_Motor_Class import Bipolar_Stepper_Motor
 import time
@@ -11,6 +12,12 @@ from numpy import pi, sin, cos, sqrt, arccos, arcsin
 #################                            ###################################################
 ################################################################################################
 ################################################################################################
+
+pi = pig.pi() # Grants access to RPI's GPIO.
+
+if not pi.connected:
+    print("Connection Failed")
+    exit()
 
 #filename='filename.nc'; #file name of the G code commands
 filename = 'GCode/grid.nc'
@@ -215,3 +222,5 @@ MX.unhold();
 MY.unhold();
 
 GPIO.cleanup();
+
+pi.stop() # Releases resources

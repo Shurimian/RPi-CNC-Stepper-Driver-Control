@@ -1,16 +1,17 @@
-import RPi.GPIO as GPIO
+import pigpio as pig
 import time
 
 class Bipolar_Stepper_Motor:
-    
+
+    # IMPORTANT: PIGPIO ONLY USES BCM NUMBERING. NOT BOARD
+    # pi = pig.pi() Grants access to RPI's GPIO. Insert into primary code
+
     dir = 0
     position = 0
     
+    # Initialize an object to control a single stepper driver
     def __init__(self, stepPin, dirPin, M0, M1, M2, sleepPin):
-    #initial a Bipolar_Stepper_Moter objects by assigning the pins
-    
-        GPIO.setmode(GPIO.BOARD)
-        
+
         self.stepPin = stepPin
         self.dirPin = dirPin
         self.M0 = M0
@@ -18,32 +19,26 @@ class Bipolar_Stepper_Motor:
         self.M2 = M2
         self.sleepPin = sleepPin
         
-        GPIO.setup(self.stepPin, GPIO.OUT)
-        GPIO.setup(self.dirPin, GPIO.OUT)
-        GPIO.setup(self.M0, GPIO.OUT)
-        GPIO.setup(self.M1, GPIO.OUT)
-        GPIO.setup(self.M2, GPIO.OUT)
-        GPIO.setup(self.sleepPin, GPIO.OUT)
+        pi.set_mode(self.stepPin, pig.OUTPUT)
+        pi.set_mode(self.dirPin, pig.OUTPUT)
+        pi.set_mode(self.M0, pig.OUTPUT)
+        pi.set_mode(self.M1, pig.OUTPUT)
+        pi.set_mode(self.M2, pig.OUTPUT)
+        pi.set_mode(self.sleepPin, pig.OUTPUT)
         
         self.dir = 0
         self.position = 0
-        self.sleepPin = 1 # Sets sleep HIGH by default. Allows for general driver use.
+        pi.write(self.sleepPin, True) # Sets sleep HIGH by default. Allows for general driver use.
         
     def move(self, dir, steps, delay = 0.2):
         for _ in range(steps):
-            next_phase = (self.phase + dir) % num_phase
             
-            GPIO.output(self.a1, phase_seq[next_phase][0])
-            GPIO.output(self.b2, phase_seq[next_phase][1])
-            GPIO.output(self.a2, phase_seq[next_phase][2])
-            GPIO.output(self.b1, phase_seq[next_phase][3])
-            
-            self.phase = next_phase
+            # MODIFY BELOW SECTION TO USE PIGPIO WAVEFORMS FOR TIMING
             self.dir = dir
             self.position += dir
             
             time.sleep(delay)
 
     def unhold(self):
-        GPIO.output(self.sleepPin, 0)
+        pi.write(self.sleepPin, False)
         
