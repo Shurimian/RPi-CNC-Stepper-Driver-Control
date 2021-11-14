@@ -17,9 +17,25 @@ filename = 'GCode/grid.nc'
 
 GPIO.setmode(GPIO.BOARD)
 
-MX = Bipolar_Stepper_Motor(23, 22, 24, 26)     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
+# X Stepper Driver Initialization
+stepPinX = 1
+dirPinX = 2
+M0X = 3
+M1X = 4
+M2X = 5
+sleepPinX = 6
 
-MY = Bipolar_Stepper_Motor(11, 7, 5, 3)       
+# Y Stepper Driver Initialization
+stepPinY = 7
+dirPinY = 8
+M0Y = 9
+M1Y = 10
+M2Y = 11
+sleepPinY = 12
+
+MX = Bipolar_Stepper_Motor(stepPinX, dirPinX, M0X, M1X, M2X, sleepPinX)     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
+
+MY = Bipolar_Stepper_Motor(stepPinY, dirPinY, M0Y, M1Y, M2Y, sleepPinY)      
 
 Laser_switch = 15
 
