@@ -1,4 +1,4 @@
-# RPi-CNC-Stepper-Driver-Control
+# RPi CNC Stepper Driver Control
 A python library allowing you to control a CNC Plotter from your Raspberry Pi.
 
 The program accepts G-Code and converts it into timed step pulses to send to stepper drivers.
