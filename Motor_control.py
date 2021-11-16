@@ -25,7 +25,7 @@ def Motor_Step(stepper1, step1, stepper2, step2, speed):
 #   stepper1 and stepper2 are objects of Bipolar_Stepper_Motor class
 #   direction is reflected in the polarity of [step1] or [step2]
 
-    dir1 = sign(step1)  #get dirction from the polarity of argument [step]
+    dir1 = sign(step1)  # Get dirction from the polarity of argument [step]
     dir2 = sign(step2)
 
     step1 = abs(step1)
@@ -49,8 +49,8 @@ def Motor_Step(stepper1, step1, stepper2, step2, speed):
         micro_step1 = total_micro_step / step1
         micro_step2 = total_micro_step / step2
 
-    T = sqrt(step1 ** 2 + step2 ** 2) / speed      #total time
-    dt = T / total_micro_step                #time delay every micro_step
+    T = sqrt(step1 ** 2 + step2 ** 2) / speed   # Total time
+    dt = T / total_micro_step                   # Time delay every micro_step
     
     for i in range(1, total_micro_step + 1):    #i is the iterator for the micro_step. i cannot start from 0
         time_laps = 0

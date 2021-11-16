@@ -22,8 +22,6 @@ if not pi.connected:
 #filename='filename.nc'; #file name of the G code commands
 filename = 'GCode/grid.nc'
 
-GPIO.setmode(GPIO.BOARD)
-
 # X Stepper Driver Initialization
 stepPinX = 1
 dirPinX = 2
@@ -40,7 +38,7 @@ M1Y = 10
 M2Y = 11
 sleepPinY = 12
 
-MX = Bipolar_Stepper_Motor(stepPinX, dirPinX, M0X, M1X, M2X, sleepPinX)     #pin number for a1,a2,b1,b2.  a1 and a2 form coil A; b1 and b2 form coil B
+MX = Bipolar_Stepper_Motor(stepPinX, dirPinX, M0X, M1X, M2X, sleepPinX)
 
 MY = Bipolar_Stepper_Motor(stepPinY, dirPinY, M0Y, M1Y, M2Y, sleepPinY)      
 
@@ -59,9 +57,8 @@ Engraving_speed = 0.4 #unit=mm/sec=0.04in/sec
 ################################################################################################
 ################################################################################################
     
-GPIO.setup(Laser_switch, GPIO.OUT)
-
-GPIO.output(Laser_switch, False)
+pi.set_mode(Laser_switch, pig.OUTPUT)
+pi.write(Laser_switch, False)
 
 speed = Engraving_speed / min(dx, dy)      #step/sec
 
@@ -73,8 +70,8 @@ speed = Engraving_speed / min(dx, dy)      #step/sec
 ################################################################################################
 ################################################################################################
 
+# Given a movement command line, return the X Y position
 def XYposition(lines):
-    #given a movement command line, return the X Y position
     xchar_loc = lines.index('X')
     i = xchar_loc + 1
     while (47 < ord(lines[i]) < 58) | (lines[i] == '.') | (lines[i] == '-'):
@@ -89,8 +86,8 @@ def XYposition(lines):
 
     return x_pos, y_pos
 
+# Given a G02 or G03 movement command line, return the I J position
 def IJposition(lines):
-    #given a G02 or G03 movement command line, return the I J position
     ichar_loc = lines.index('I')
     i = ichar_loc + 1
     while (47 < ord(lines[i]) < 58) | (lines[i] == '.') | (lines[i] == '-'):
@@ -105,15 +102,15 @@ def IJposition(lines):
 
     return i_pos, j_pos
 
+# Move to (x_pos,y_pos) (in real unit)
 def moveto(MX, x_pos, dx, MY, y_pos, dy, speed, engraving):
-#Move to (x_pos,y_pos) (in real unit)
     stepx = int(round(x_pos / dx)) - MX.position
     stepy = int(round(y_pos / dy)) - MY.position
 
     Total_step = sqrt((stepx ** 2 + stepy ** 2))
             
     if ~engraving:
-        if lines[0:3] == 'G0 ': #fast movement
+        if lines[0:3] == 'G0 ': # Fast movement, no printing
             print ('No Laser, fast movement: Dx=', stepx, '  Dy=', stepy)
             Motor_control.Motor_Step(MX, stepx, MY, stepy, 25)
         else:
@@ -129,41 +126,46 @@ def moveto(MX, x_pos, dx, MY, y_pos, dy, speed, engraving):
 ###########################################################################################
 ###########################################################################################
 
-try:#read and execute G code
+# Read and execute G code
+try:
     for lines in open(filename, 'r'):
         if lines == []:
-            1 #blank lines
+            1 # If blank line exists, do nothing
+
         elif lines[0:3] == 'G90':
-            print ('start')
-            
-        elif lines[0:3] == 'G20':# working in inch;
+            print ('Start')
+
+        elif lines[0:3] == 'G20': # Working in inches;
             dx /= 25.4
             dy /= 25.4
-            print ('Working in inch')
-              
-        elif lines[0:3] == 'G21':# working in mm;
-            print ('Working in mm')  
-            
+            print ('Working in inches')
+
+        elif lines[0:3] == 'G21': # Working in mm;
+            print ('Working in mm')
+
         elif lines[0:3] == 'M05':
-            GPIO.output(Laser_switch, False)
+            pi.write(Laser_switch, False)
             print ('Laser turned off')
-            
+
         elif lines[0:3] == 'M03':
-            GPIO.output(Laser_switch, True)
+            pi.write(Laser_switch, True)
             print ('Laser turned on')
 
         elif lines[0:3] == 'M02':
-            GPIO.output(Laser_switch, False)
-            print ('finished. shuting down')
-            break;
+            pi.write(Laser_switch, False)
+            print ('Finished. Shuting down')
+            break
+
         elif (lines[0:3] == 'G1F')|(lines[0:4] == 'G1 F'):
-            1 #do nothing
-        elif (lines[0:3] == 'G0 ') | (lines[0:3] == 'G1 ') | (lines[0:3] == 'G01'): #|(lines[0:3]=='G02')|(lines[0:3]=='G03'):
-            #linear engraving movement
+            1 # Do nothing
+
+        elif (lines[0:3] == 'G0 ') | (lines[0:3] == 'G1 ') | (lines[0:3] == 'G01'):
+            # Linear movement
+
             if (lines[0:3] == 'G0 '):
-                engraving = False
+                engraving = False # Move without pen on paper
             else:
-                engraving = True
+                engraving = True # Move while pen is on paper
                 
             [x_pos, y_pos] = XYposition(lines)
             moveto(MX, x_pos, dx, MY, y_pos, dy, speed, engraving)
@@ -218,9 +220,7 @@ except KeyboardInterrupt:
 GPIO.output(Laser_switch, False)   # turn off laser
 moveto(MX, 0, dx, MY, 0, dy, 25, False)  # move back to Origin
 
-MX.unhold();
-MY.unhold();
-
-GPIO.cleanup();
+MX.unhold()
+MY.unhold()
 
 pi.stop() # Releases resources
