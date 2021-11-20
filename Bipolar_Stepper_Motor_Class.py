@@ -7,7 +7,7 @@ class Bipolar_Stepper_Motor:
     # pi = pig.pi() Grants access to RPI's GPIO. Insert into primary code
 
     dir = 0
-    position = 0
+    position = 0 # Current "step position" of motor. A single revolution has 200 positions (steps)
     
     # Initialize an object to control a single stepper driver
     def __init__(self, stepPin, dirPin, M0, M1, M2, sleepPin):

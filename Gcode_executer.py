@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import pigpio as pig
 import Motor_control
+from wavePWM import PWM
 from Bipolar_Stepper_Motor_Class import Bipolar_Stepper_Motor
 import time
 from numpy import pi, sin, cos, sqrt, arccos, arcsin
@@ -14,6 +15,7 @@ from numpy import pi, sin, cos, sqrt, arccos, arcsin
 ################################################################################################
 
 pi = pig.pi() # Grants access to RPI's GPIO.
+pwm = PWM(pi)
 
 if not pi.connected:
     print("Connection Failed")
@@ -22,7 +24,17 @@ if not pi.connected:
 #filename='filename.nc'; #file name of the G code commands
 filename = 'GCode/grid.nc'
 
-# X Stepper Driver Initialization
+# Different Step modes
+stepMode = {
+    "full" : [0, 0, 0],
+    "half" : [1, 0, 0],
+    "1/4" : [0, 1, 0],
+    "1/8" : [1, 1, 0],
+    "1/16" : [0, 0, 1],
+    "1/32" : [1, 0, 1],
+}
+
+# Initialize pin positions for X Stepper Driver
 stepPinX = 1
 dirPinX = 2
 M0X = 3
@@ -30,7 +42,7 @@ M1X = 4
 M2X = 5
 sleepPinX = 6
 
-# Y Stepper Driver Initialization
+# Initialize pin positions for Y Stepper Driver
 stepPinY = 7
 dirPinY = 8
 M0Y = 9
@@ -72,17 +84,18 @@ speed = Engraving_speed / min(dx, dy)      #step/sec
 
 # Given a movement command line, return the X Y position
 def XYposition(lines):
-    xchar_loc = lines.index('X')
-    i = xchar_loc + 1
-    while (47 < ord(lines[i]) < 58) | (lines[i] == '.') | (lines[i] == '-'):
-        i += 1
-    x_pos = float(lines[xchar_loc + 1:i])    
+
+    xchar_loc = lines.index('X')                                                # Find character position where X starts.
+    i = xchar_loc + 1                                                           # Add one so you start searching from the character AFTER X.
+    while (47 < ord(lines[i]) < 58) | (lines[i] == '.') | (lines[i] == '-'):    # Keep counting characters if positional value is valid.
+        i += 1                                                                  # Index current value
+    x_pos = float(lines[(xchar_loc + 1) : i])                                   # Convert that value into a number
     
     ychar_loc = lines.index('Y')
     i = ychar_loc + 1
     while (47 < ord(lines[i]) < 58) | (lines[i] == '.') | (lines[i] == '-'):
         i += 1
-    y_pos = float(lines[ychar_loc + 1:i])    
+    y_pos = float(lines[(ychar_loc + 1) : i])    
 
     return x_pos, y_pos
 
